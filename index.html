@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>凜花ST1與中間酸AC髮質調配計算機</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f4f6f8; margin: 0; padding: 20px; color: #333; }
+        .card { max-width: 500px; margin: 0 auto; background: #ffffff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        
+        #authOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(244, 246, 248, 0.98); display: flex; justify-content: center; align-items: center; z-index: 999; }
+        .auth-box { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); text-align: center; max-width: 360px; width: 90%; }
+        .auth-title { font-size: 18px; font-weight: bold; color: #1a365d; margin-bottom: 10px; }
+        .auth-desc { font-size: 14px; color: #718096; margin-bottom: 20px; line-height: 1.4; }
+        .error-msg { color: #e53e3e; font-size: 13px; margin-top: 15px; display: none; line-height: 1.4; white-space: pre-line; }
+        .user-bar { display: flex; justify-content: space-between; align-items: center; background: #edf2f7; padding: 8px 12px; border-radius: 6px; font-size: 12px; color: #4a5568; margin-bottom: 15px; }
+
+        .product-img { width: 100%; height: 100px; object-fit: contain; margin-bottom: 10px; border-radius: 4px; background-color: #ffffff; }
+        h2 { text-align: center; color: #1a365d; margin-top: 0; font-size: 20px; }
+        .spec-container { display: flex; gap: 10px; margin-bottom: 20px; }
+        .spec-box { flex: 1; background: #edf2f7; padding: 12px; border-radius: 6px; font-size: 12px; color: #4a5568; line-height: 1.5; text-align: center; }
+        .spec-details { text-align: left; }
+        .form-group { margin-bottom: 18px; }
+        label { font-weight: 600; display: block; margin-bottom: 6px; font-size: 14px; color: #2d3748; }
+        input[type="number"], select { width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 6px; box-sizing: border-box; font-size: 16px; background-color: #fff; }
+        .btn { width: 100%; padding: 12px; background-color: #2b6cb0; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+        .btn:hover { background-color: #2c5282; }
+        .btn:disabled { background-color: #a0aec0; cursor: not-allowed; }
+        .result-box { margin-top: 20px; padding: 15px; background-color: #ebf8ff; border-left: 4px solid #3182ce; border-radius: 4px; }
+        .result-title { font-size: 14px; color: #2c5282; font-weight: bold; }
+        .result-value { font-size: 20px; color: #1a365d; font-weight: bold; margin-top: 5px; }
+        .detail-row { display: flex; justify-content: space-between; margin-top: 8px; font-size: 14px; color: #2d3748; }
+        .note { font-size: 12px; color: #718096; margin-top: 15px; line-height: 1.4; }
+    </style>
+</head>
+<body>
+
+<div id="authOverlay">
+    <div class="auth-box">
+        <div class="auth-title">凜花ST1 配方計算機</div>
+        <div class="auth-desc">本系統僅供授權沙龍夥伴使用<br>請先透過 Google 帳號進行身分驗證</div>
+        
+        <div id="g_id_onload"
+             data-client_id="256252924752-hecglpped7jqslrnr2enrc9rqr5hh4kl.apps.googleusercontent.com"
+             data-callback="handleCredentialResponse">
+        </div>
+        <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline" data-text="sign_in_with"></div>
+
+        <div id="errorMsg" class="error-msg"></div>
+    </div>
+</div>
+
+<div class="card" id="appCard" style="display: none;">
+    <div class="user-bar">
+        <span>已驗證使用者：<b id="userEmail">--</b></span>
+        <a href="#" onclick="logout()" style="color: #e53e3e; text-decoration: none; font-weight: bold;">登出</a>
+    </div>
+
+    <h2>凜花ST1 × 中間酸AC<br>髮質調配計算機</h2>
+    
+    <div class="spec-container">
+        <div class="spec-box">
+            <img src="請貼上ST1一劑直接圖片網址.jpg" alt="直髮一劑" class="product-img">
+            <div class="spec-details">
+                <strong>一劑規格 (ST-I)：</strong><br>
+                • 初始 pH：9.2<br>
+                • 鹼度：6.7%<br>
+                • 還原劑力：8.5%
+            </div>
+        </div>
+        
+        <div class="spec-box">
+            <img src="請貼上中間酸AC直接圖片網址.jpg" alt="中間酸" class="product-img">
+            <div class="spec-details">
+                <strong>中間酸規格 (AQUA AC)：</strong><br>
+                • 初始 pH：5.0<br>
+                • 酸度：2.0%<br>
+                • 體系：複方緩衝
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="hairType">選擇目標對應髮質：</label>
+        <select id="hairType">
+            <option value="0">原生髮 (添加 0% 中間酸)</option>
+            <option value="0.10">低度受損髮 (以一劑為基準 +10% 中間酸)</option>
+            <option value="0.20">高度受損髮 (以一劑為基準 +20% 中間酸)</option>
+            <option value="0.30">熟齡髮 (以一劑為基準 +30% 中間酸)</option>
+            <option value="1.00">漂後髮 (1 : 1 混合 / +100% 中間酸)</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="totalWeight">預計調配總重量 (g)：</label>
+        <input type="number" id="totalWeight" step="1" value="100" min="1">
+    </div>
+
+    <button class="btn" id="calcBtn" onclick="calculateRatio()">計算調配配方</button>
+
+    <div class="result-box" id="resultBox" style="display:none;">
+        <div class="result-title">相對比例 (固定一劑為 1)：</div>
+        <div class="result-value" id="ratioResult">--</div>
+        <hr style="border:0; border-top:1px solid #bee3f8; margin: 10px 0;">
+        <div class="detail-row">
+            <span><b>燙髮一劑 (ST-I)：</b></span>
+            <span><b id="p1Weight">0</b> g</span>
+        </div>
+        <div class="detail-row">
+            <span><b>中間酸 (LUCICARE AQUA AC)：</b></span>
+            <span><b id="p2Weight">0</b> g</span>
+        </div>
+        <hr style="border:0; border-top:1px dashed #bee3f8; margin: 10px 0;">
+        <div class="detail-row" style="color: #2c5282;">
+            <span><b>預計混合後最終鹼度：</b></span>
+            <span><b id="finalAlkalinity">0</b> %</span>
+        </div>
+    </div>
+
+    <div class="note">
+        * 中間酸比例係依據「一劑克數」為基準量 (100%) 進行添加計算。<br>
+        * 鹼度採用學術精準當量中和與質量稀釋模型計算。<br>
+        * 現場請使用精密電子秤（單位 0.1g）進行秤取與均勻攪拌。
+    </div>
+</div>
+
+<script>
+// 後端 Web App URL
+const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzf1Y8Dh9gscHBrrcTruJa5BJHQkqLPdESe5ow5ggaASmgHVICWCr8ehbv5Rxw9ig0/exec";
+let currentIdToken = "";
+
+// 登入成功處理
+function handleCredentialResponse(response) {
+    currentIdToken = response.credential;
+    
+    // 初次登入時發送測試請求驗證身分
+    fetchCalculation(0, 100, true);
+}
+
+// 向後端請求安全計算
+function calculateRatio() {
+    const hairType = document.getElementById('hairType').value;
+    const totalWeight = document.getElementById('totalWeight').value;
+
+    if (isNaN(totalWeight) || totalWeight <= 0) {
+        alert("請輸入正確的預計總重量！");
+        return;
+    }
+
+    fetchCalculation(hairType, totalWeight, false);
+}
+
+function fetchCalculation(hairType, totalWeight, isInitialAuthCheck) {
+    const calcBtn = document.getElementById('calcBtn');
+    calcBtn.innerText = "驗證與計算中...";
+    calcBtn.disabled = true;
+
+    fetch(GAS_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+            idToken: currentIdToken,
+            hairType: hairType,
+            totalWeight: totalWeight
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        calcBtn.innerText = "計算調配配方";
+        calcBtn.disabled = false;
+
+        if (data.success) {
+            // 身分驗證成功
+            document.getElementById('authOverlay').style.display = 'none';
+            document.getElementById('appCard').style.display = 'block';
+            document.getElementById('userEmail').innerText = data.userEmail;
+
+            if (!isInitialAuthCheck) {
+                // 渲染後端傳回的運算結果
+                document.getElementById('ratioResult').innerText = data.ratioText;
+                document.getElementById('p1Weight').innerText = data.p1Weight;
+                document.getElementById('p2Weight').innerText = data.p2Weight;
+                document.getElementById('finalAlkalinity').innerText = data.finalAlkalinity;
+                document.getElementById('resultBox').style.display = 'block';
+            }
+        } else {
+            // 身分驗證失敗
+            const errorElement = document.getElementById('errorMsg');
+            errorElement.innerText = data.message;
+            errorElement.style.display = 'block';
+            document.getElementById('authOverlay').style.display = 'flex';
+            document.getElementById('appCard').style.display = 'none';
+        }
+    })
+    .catch(err => {
+        calcBtn.innerText = "計算調配配方";
+        calcBtn.disabled = false;
+        alert("連線後端伺服器發生錯誤，請稍後再試。");
+    });
+}
+
+function logout() {
+    currentIdToken = "";
+    document.getElementById('appCard').style.display = 'none';
+    document.getElementById('authOverlay').style.display = 'flex';
+    document.getElementById('errorMsg').style.display = 'none';
+}
+</script>
+
+</body>
+</html>
